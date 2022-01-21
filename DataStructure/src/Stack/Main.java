@@ -13,12 +13,13 @@ public class Main {
 		s.push(6);
 		s.push(7);
 		
-		s.top();
+		System.out.println(s.top());
 		s.pop();
-		s.top();
+		System.out.println(s.top());
 		s.pop();
+		System.out.println(s.top());
 		
-		s.search(4);
+		System.out.println(s.search(4));
 
 	}
 
