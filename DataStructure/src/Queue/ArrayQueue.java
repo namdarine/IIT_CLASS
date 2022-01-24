@@ -1,5 +1,5 @@
 /* Using Array Bounded List
- * This is "Floating Front Queue"
+ * Known as "Floating Front Queue"
  */
 
 package Queue;
