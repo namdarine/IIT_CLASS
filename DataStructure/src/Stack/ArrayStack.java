@@ -1,3 +1,4 @@
+// Using Array Bounded List Stack
 package Stack;
 
 public class ArrayStack<T> implements StackInterface<T> {
@@ -40,7 +41,7 @@ public class ArrayStack<T> implements StackInterface<T> {
 		}
 	}
 	
-	// Observer
+	// Observers
 	public T top() throws StackUnderflowException {
 		T topStack = null;
 		
