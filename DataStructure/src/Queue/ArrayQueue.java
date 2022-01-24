@@ -77,12 +77,12 @@ public class ArrayQueue<T> implements QueueInterface<T> {
 	}
 	
 	public Object front() {
-		return front;
+		return elements[front];
 	}
 	// Returns the front index of this queue
 	
 	public Object rear() {
-		return rear;
+		return elements[rear];
 	}
 	// Returns the rear index of this queue
 	

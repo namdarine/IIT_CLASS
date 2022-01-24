@@ -14,8 +14,8 @@ public class QueueMain {
 		aQue.enqueue(7);
 		aQue.enqueue(8);
 		
-		System.out.println(aQue.front);
-		System.out.println(aQue.rear);
+		System.out.println(aQue.front());
+		System.out.println(aQue.rear());
 		System.out.println(aQue.size());
 		System.out.println(aQue.isEmpty());
 		System.out.println(aQue.isFull());
