@@ -79,12 +79,12 @@ public class ArrayQueue<T> implements QueueInterface<T> {
 	public Object front() {
 		return elements[front];
 	}
-	// Returns the front index of this queue
+	// Returns the front element of this queue
 	
 	public Object rear() {
 		return elements[rear];
 	}
-	// Returns the rear index of this queue
+	// Returns the rear element of this queue
 	
 	public void dump() throws QueueUnderflowException {
 		if (isEmpty())
