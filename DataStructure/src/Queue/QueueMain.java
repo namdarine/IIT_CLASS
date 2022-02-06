@@ -4,6 +4,7 @@ public class QueueMain {
 	public static void main(String[] args) throws QueueOverflowException, QueueUnderflowException {
 		ArrayQueue<Integer> aQue = new ArrayQueue<>();
 		FixedFrontQueue<Integer> fQue = new FixedFrontQueue<>();
+		LLQueue<Integer> lQue = new LLQueue<>();
 		
 		System.out.println("Floating front Queue: ");
 		aQue.enqueue(1);
@@ -53,6 +54,29 @@ public class QueueMain {
 		System.out.println("After dequeue twice, rear index is: " + fQue.rear());
 		System.out.println("After dequeue twice, rear element is: " + fQue.rearEle());
 		fQue.dump();
+		
+		System.out.println("\nLinked-list Queue: ");
+		lQue.enqueue(11);
+		lQue.enqueue(12);
+		lQue.enqueue(13);
+		lQue.enqueue(14);
+		lQue.enqueue(15);
+		lQue.enqueue(16);
+		lQue.enqueue(17);
+		lQue.enqueue(18);
+		
+		//lQue.dump();
+		System.out.println("Front index is: " + lQue.front());
+		System.out.println("Rear index is: " + lQue.rear());
+		System.out.println("Queue's size is: " + lQue.size());
+		System.out.println("Is Queue empty? " + lQue.isEmpty());
+		System.out.println("Is Queue full? " + lQue.isFull());
+		System.out.println(lQue.dequeue());
+		System.out.println(lQue.dequeue());
+		System.out.println("Queue's size is after dequeue twice: " + lQue.size());
+		System.out.println("After dequeue twice, front index is: " + lQue.front());
+		System.out.println("After dequeue twice, rear index is: " + lQue.rear());
+		//lQue.dump();
 
 	}
 
