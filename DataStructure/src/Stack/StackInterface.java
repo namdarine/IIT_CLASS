@@ -19,7 +19,7 @@ public interface StackInterface<T> {
 	boolean isFull();
 	// If the stack is full, returns true. Otherwise false.
 	
-	int search(T value);
+	//int search(T value);
 	// Returns the position where a value is on this stack. Returns '-1' if the value does not on the stack.
 
 }

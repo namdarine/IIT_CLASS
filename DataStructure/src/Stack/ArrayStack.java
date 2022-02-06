@@ -69,7 +69,7 @@ public class ArrayStack<T> implements StackInterface<T> {
 	public int search(T value) {
 		for (int index = topIndex -1; index >= 0; index--) {
 			if (elements[index].equals(value))
-				return topIndex - index;
+				return (topIndex - 1) - index;
 			
 			// If found the value, returns the position of the value in this stack.
 		}

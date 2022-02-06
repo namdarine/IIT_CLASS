@@ -47,7 +47,6 @@ public class ArrayListStack<T> implements StackInterface<T> {
 		// Because Array list does not full. There is not default capacity of stack.
 	}
 
-	@Override
 	public int search(T value) {
 		for (int index = elements.size() -1; index >= 0; index--) {
 			if (elements.contains(value))
