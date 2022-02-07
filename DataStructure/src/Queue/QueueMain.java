@@ -5,6 +5,7 @@ public class QueueMain {
 		ArrayQueue<Integer> aQue = new ArrayQueue<>();
 		FixedFrontQueue<Integer> fQue = new FixedFrontQueue<>();
 		LLQueue<Integer> lQue = new LLQueue<>();
+		CLQueue<Integer> cQue = new CLQueue<>();
 		
 		System.out.println("Floating front Queue: ");
 		aQue.enqueue(1);
@@ -66,7 +67,7 @@ public class QueueMain {
 		lQue.enqueue(18);
 		
 		lQue.dump();
-		System.out.println("Front index is: " + lQue.front());
+		System.out.println("\nFront index is: " + lQue.front());
 		System.out.println("Rear index is: " + lQue.rear());
 		System.out.println("Queue's size is: " + lQue.size());
 		System.out.println("Is Queue empty? " + lQue.isEmpty());
@@ -81,9 +82,43 @@ public class QueueMain {
 		lQue.dequeue();
 		lQue.dequeue();
 		lQue.dequeue();
-		lQue.dequeue();
-		lQue.dequeue();
-		lQue.dequeue();
+
+		System.out.println("\nCircular Linked-list Queue: ");
+		cQue.enqueue(11);
+		cQue.enqueue(12);
+		cQue.enqueue(13);
+		cQue.enqueue(14);
+		cQue.enqueue(15);
+		cQue.enqueue(16);
+		cQue.enqueue(17);
+		cQue.enqueue(18);
+		
+		cQue.dump();
+		System.out.println("\nFront index is: " + cQue.front());
+		System.out.println("Rear index is: " + cQue.rear());
+		System.out.println("Queue's size is: " + cQue.size());
+		System.out.println("Is Queue empty? " + cQue.isEmpty());
+		System.out.println("Is Queue full? " + cQue.isFull());
+		System.out.println(cQue.dequeue());
+		System.out.println(cQue.dequeue());
+		System.out.println("Queue's size is after dequeue twice: " + cQue.size());
+		System.out.println("After dequeue twice, front element is: " + cQue.front());
+		System.out.println("After dequeue twice, rear element is: " + cQue.rear());
+		cQue.dump();
+		System.out.println("\n" + cQue.dequeue());
+		System.out.println(cQue.dequeue());
+		System.out.println(cQue.dequeue());
+		System.out.println(cQue.dequeue());
+		System.out.println("After dequeue four times, front element is: " + cQue.front());
+		System.out.println("After dequeue four times, rear element is: " + cQue.rear());
+		cQue.dump();
+		cQue.enqueue(21);
+		cQue.enqueue(23);
+		cQue.enqueue(24);
+		System.out.println("\nAfter enqueue, front element is: " + cQue.front());
+		System.out.println("After enqueue, rear element is: " + cQue.rear());
+		cQue.dump();
+
 
 	}
 
