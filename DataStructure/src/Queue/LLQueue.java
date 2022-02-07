@@ -1,8 +1,6 @@
 // Using Linked list Queue
 package Queue;
 
-import java.util.*;
-
 public class LLQueue<T> implements QueueInterface<T> {
 	// Node class
 	class Node<T> {
@@ -44,13 +42,18 @@ public class LLQueue<T> implements QueueInterface<T> {
 	// Transformer
 	public void enqueue(T element) {
 		Node<T> newNode = new Node<T>(element);
-		if (rear == front)
-			front = newNode;
+		if (isEmpty() == true) {			// If this queue is empty, add new element in the front of this queue.
+			newNode.next = front;			// Make new node.
+			front = newNode;				// Set new front.
+			
+			if (front.next == null)
+				rear = front;
+		}
 		
-		else
-			rear.setNext(newNode);
+		else 								// If this queue is not empty, add new element in the rear of this queue.
+			rear.next = newNode;			// Make new node and linked it.
 		
-		rear = newNode;
+		rear = newNode;						// Set new rear.
 		num++;
 	}
 	
@@ -89,6 +92,14 @@ public class LLQueue<T> implements QueueInterface<T> {
 	
 	public int size() {
 		return num;
+	}
+	
+	public void dump() {			// List all elements in this queue.
+		Node<T> ptr = front;
+		while (ptr != null) {
+			System.out.println(ptr.data);
+			ptr = ptr.next;
+		}
 	}
 
 }

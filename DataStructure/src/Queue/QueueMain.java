@@ -65,7 +65,7 @@ public class QueueMain {
 		lQue.enqueue(17);
 		lQue.enqueue(18);
 		
-		//lQue.dump();
+		lQue.dump();
 		System.out.println("Front index is: " + lQue.front());
 		System.out.println("Rear index is: " + lQue.rear());
 		System.out.println("Queue's size is: " + lQue.size());
@@ -74,9 +74,16 @@ public class QueueMain {
 		System.out.println(lQue.dequeue());
 		System.out.println(lQue.dequeue());
 		System.out.println("Queue's size is after dequeue twice: " + lQue.size());
-		System.out.println("After dequeue twice, front index is: " + lQue.front());
-		System.out.println("After dequeue twice, rear index is: " + lQue.rear());
-		//lQue.dump();
+		System.out.println("After dequeue twice, front element is: " + lQue.front());
+		System.out.println("After dequeue twice, rear element is: " + lQue.rear());
+		lQue.dump();
+		lQue.dequeue();
+		lQue.dequeue();
+		lQue.dequeue();
+		lQue.dequeue();
+		lQue.dequeue();
+		lQue.dequeue();
+		lQue.dequeue();
 
 	}
 
