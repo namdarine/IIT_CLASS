@@ -42,7 +42,7 @@ public class LLQueue<T> implements QueueInterface<T> {
 	// Transformer
 	public void enqueue(T element) {
 		Node<T> newNode = new Node<T>(element);
-		if (isEmpty() == true) {			// If this queue is empty, add new element in the front of this queue.
+		if (isEmpty()) {			// If this queue is empty, add new element in the front of this queue.
 			newNode.next = front;			// Make new node.
 			front = newNode;				// Set new front.
 			
@@ -74,6 +74,7 @@ public class LLQueue<T> implements QueueInterface<T> {
 		}
 	}
 	
+	// Observers
 	public Object front() {
 		return front.getData();
 	}
@@ -97,7 +98,7 @@ public class LLQueue<T> implements QueueInterface<T> {
 	public void dump() {			// List all elements in this queue.
 		Node<T> ptr = front;
 		while (ptr != null) {
-			System.out.println(ptr.data);
+			System.out.printf("%d ", ptr.data);
 			ptr = ptr.next;
 		}
 	}
