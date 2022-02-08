@@ -1,5 +1,5 @@
 # DataStructure
-_Including IIT data structure lecture (CS 401 prof. Mike Choi)._
+_Including IIT data structure lecture (CS 401 prof. Michael Choi)._
 - Stack
   - Array Bounded list stack
   - Array Unbounded list stack
