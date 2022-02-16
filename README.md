@@ -11,3 +11,4 @@ _Including IIT data structure lecture (CS 401 prof. Michael Choi)._
   - Circular linked list Queue
 - List
   - Linked list
+- BST (Binary Search Tree)
