@@ -23,17 +23,17 @@ public class BST<T> {
 	// Add Node T to subtree
 	private void addNode (BSTNode<T> node, T key) {
 		int cond = compa(key, node.getKey());
-		if (cond == 0)
+		if (cond == 0)							// Means that two keys are same.
 			return;
 		
-		else if (cond < 0) {
+		else if (cond < 0) {					// New node's key is smaller than root node.
 			if (node.getLeft() == null)
 				node.setLeft(new BSTNode<T>(key));
 			else
 				addNode(node.getLeft(), key);
 		}
 		
-		else {
+		else {									// New node's key is bigger than root node.
 			if (node.getRight() == null)
 				node.setRight(new BSTNode<T>(key));
 			
@@ -44,7 +44,7 @@ public class BST<T> {
 	
 	// Add Node
 	public void add(T key) {
-		if (root == null)
+		if (root == null)						// Add key to the root.
 			root = new BSTNode<T>(key);
 		else
 			addNode(root, key);

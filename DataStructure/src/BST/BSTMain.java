@@ -50,6 +50,7 @@ public class BSTMain {
 		bst.postorder();
 		System.out.println("\n8. Smallest number in this tree: " + bst.min());
 		System.out.println("\nIs there '35' in this tree? " + bst.contain(35));
+		System.out.println("\nIs there '40' in this tree? " + bst.contain(40));
 		System.out.println("\n9. Largest number in this tree: " + bst.max());
 	}
 
