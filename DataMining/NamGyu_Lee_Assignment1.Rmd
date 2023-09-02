@@ -2,6 +2,9 @@
 title: "CS 422 Assignment 1"
 author: "Nam Gyu Lee"
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   html_notebook:
     toc: yes
     toc_float: yes
@@ -24,9 +27,15 @@ output:
 #### left of the edit window.  Click this button and a html document should
 #### pop up with the output from this R markdown script.
 
+```{r, setup, include=FALSE}
+# The setup chunk, set your working directory here and do other global 
+# tasks like loading libraries.  See  
+# https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html for
+# more information.
+knitr::opts_knit$set(root.dir = '.../CS 422/DataMining/')
+```
 ### Part 1-A
 ```{r}
-setwd("/tmp")
 data(cars)
 cars
 ```
@@ -35,12 +44,14 @@ cars
 
 ```{r}
 # Add code here.  See manual page for the plot() command.
-# png(file="cars_speed_dist.png")
+
 plot(x=cars$speed, y=cars$dist, xlab="Speed", ylab="Distance", 
      main="Speed and Distance Scatterplot")
-dev.off()
+
 
 plot(cars, type="l", xlab="Speed", ylab="Distance", main="Speed and Distacne Line Graph")
+
+dev.off()
 ```
 ### Part 1-C (Summary)
 ```{r}
