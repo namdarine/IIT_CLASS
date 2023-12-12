@@ -34,6 +34,10 @@ output:
 # more information.
 knitr::opts_knit$set(root.dir = '.../CS 422/DataMining/')
 ```
+<<<<<<< HEAD:DataMining/Assignment1.Rmd
+=======
+
+>>>>>>> 015b708736051a9289fc711c7a65bacdf6f2b535:DataMining/NamGyu_Lee_Assignment1.Rmd
 ### Part 1-A
 ```{r}
 data(cars)
@@ -47,7 +51,10 @@ cars
 
 plot(x=cars$speed, y=cars$dist, xlab="Speed", ylab="Distance", 
      main="Speed and Distance Scatterplot")
+<<<<<<< HEAD:DataMining/Assignment1.Rmd
 
+=======
+>>>>>>> 015b708736051a9289fc711c7a65bacdf6f2b535:DataMining/NamGyu_Lee_Assignment1.Rmd
 
 plot(cars, type="l", xlab="Speed", ylab="Distance", main="Speed and Distacne Line Graph")
 
