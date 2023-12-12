@@ -1,0 +1,202 @@
+---
+title: "CS 422 Assignment 8"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '/Users/namgyulee/IIT_CLASS/DataMining/')
+```
+
+# 2. Practicum Problems
+
+## 2.1 K-means clustering
+```{r}
+rm(list=ls())
+```
+
+### a)
+#### i)
+```{r}
+library(factoextra)
+
+df <- read.table("file19.txt", header = TRUE, quote = "\"")
+df <- (df[ , c("Name", "M", "m")])
+```
+
+#### ii)
+```{r}
+df.scaled <- scale(df[2:3])
+
+k <- kmeans(df[2:3], centers=3) 
+k.scaled <- kmeans(df.scaled, centers=3)
+
+fviz_cluster(k, data=df[2:3], main="Unscaled clusters") 
+fviz_cluster(k.scaled, data=df.scaled, main="Scaled clusters") 
+```
+
+Yes, it needs to be standardized. Because as we can see in the plot, they are clustered in differently. 
+
+#### iii)
+```{r}
+library(dplyr)
+
+df_cleaned <- mutate_all(df, funs(gsub("\\s+", " ", .)))
+
+# Replace the existing delimiter with a comma
+write.table(df_cleaned, file = "cleaned_file19.csv", sep = ",", row.names = FALSE)
+```
+
+### b)
+
+#### i)
+```{r}
+library(cluster)
+library(factoextra)
+new_df <- read.csv("cleaned_file19.csv")
+new_scaled_df <- scale(new_df[2:3])
+
+# wss method
+fviz_nbclust(new_scaled_df, kmeans, method = "wss", k.max = 9) 
+
+# silhouette method
+fviz_nbclust(new_scaled_df, kmeans, method = "silhouette", k.max = 9)
+```
+
+#### ii)
+```{r}
+fviz_cluster(kmeans(new_scaled_df, centers=9, nstart=25), data=new_scaled_df)
+```
+
+
+#### iii)
+```{r}
+clusters <- kmeans(new_scaled_df, centers = 9, nstart = 25)
+
+table(clusters$cluster)
+```
+
+#### iv)
+```{r}
+cat("The total SSE of the clusters: ", clusters$totss)
+```
+
+#### v)
+```{r}
+clusters$withinss
+```
+
+```{r}
+df2 <- data.frame(c(new_df[1], new_scaled_df))
+for (i in 1:max(clusters$cluster)) {
+  indicate <- which(clusters$cluster == i)
+  name <- paste(df2[indicate, 1], collapse = ", ")
+
+  cat("Cluster ", i, ": ", name, "\n")
+}
+
+```
+
+Some clusters align well with the expectations based on the characteristics and ecological roles of the mammals.But, a couple clusters grouped with the unexpectations.
+
+## 2.2
+```{r}
+df3 <- read.csv("s1.csv", header = TRUE)
+```
+
+### a)
+```{r}
+df3.scaled <- scale(df3)
+
+k <- kmeans(df3, centers=4) 
+k.scaled <- kmeans(df3.scaled, centers=4)
+
+fviz_cluster(k, data=df3, main="Unscaled clusters")
+fviz_cluster(k.scaled, data=df3.scaled, main="Scaled clusters")
+```
+
+No, it is not necessary. As we can see the plot, both are clustered similarly.
+
+### b)
+
+#### i)
+```{r}
+plot(df3)
+```
+
+#### ii)
+There are 15 clusters and they are well separated.
+
+### c)
+
+#### i)
+```{r}
+fviz_nbclust(df3.scaled, kmeans, method = "wss", k.max = 18)
+```
+
+#### ii)
+```{r}
+fviz_nbclust(df3.scaled, kmeans, method = "silhouette", k.max = 18)
+```
+
+#### iii)
+16 clusters.
+
+### d)
+
+#### i)
+```{r}
+fviz_cluster(kmeans(df3.scaled, centers=16, nstart=30), data=df3)
+```
+
+#### ii)
+One of the clusters is divided into two clusters due to the points that are in between the two different clusters.
+
+### e)
+
+#### i)
+```{r}
+fviz_cluster(kmeans(df3.scaled, centers=4, nstart=30), data=df3.scaled)
+```
+
+4, as we could see the plot with 4 centers, most of the clusters are included within a certain distance. Also, according to lecture, MinPts = 2 * dimension. In this case, dimension is 2. Therefore, MinPts is 4.
+
+#### ii)
+```{r}
+library(dbscan)
+k_value = 4
+kNNdistplot(df3, k_value)
+
+```
+
+```{r}
+eps_vals <- seq(20400, 20550, by = 10)
+
+cluster_nums <- list()
+cluster_plots <- list()
+best_epsilon <- NULL
+best_num_clusters <- Inf
+minPts <- 4
+
+for (eps in eps_vals) {
+  dbscan_results <- dbscan(df3, eps = eps, MinPts = minPts)
+  
+  num_clusters <- length(unique(dbscan_results$cluster[dbscan_results$cluster != 0]))
+  
+  cluster_nums[[eps]] <- length(unique(dbscan_results$cluster))
+  cluster_plots[[eps]] <- plot(df3, col = dbscan_results$cluster, main = paste("DBSCAN Clustering (eps =", eps, ")", num_clusters))
+  
+  if (num_clusters == 16 && num_clusters < best_num_clusters) {
+    best_epsilon <- eps
+    best_num_clusters <- num_clusters
+  }
+}
+cat("At minPts = ", minPts, ", eps = ", best_epsilon, ", there are ", best_num_clusters, " clusters")
+
+```

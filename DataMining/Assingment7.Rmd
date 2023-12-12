@@ -1,0 +1,124 @@
+---
+title: "CS 422 Assignment 7"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '/Users/namgyulee/IIT/Fall 2023/CS 422/Assignment/CS422_Assignment7_NamGyu_Lee/')
+```
+
+# 2. Practicum Problems
+
+## 2.1 Association Analysis
+
+```{r}
+library(arules)
+library(arulesViz)
+
+rm(list=ls())
+
+trans_1k <- read.transactions("tr-1k-canonical.csv", sep = ",")
+trans_5k <- read.transactions("tr-5k-canonical.csv", sep = ",")
+trans_20k <- read.transactions("tr-20k-canonical.csv", sep = ",")
+trans_75k <- read.transactions("tr-75k-canonical.csv", sep = ",")
+```
+
+### b
+
+```{r}
+print("Frequent itemsets:\n")
+freq_trans_1k <- apriori(trans_1k, parameter=list(support=0.005, target="frequent itemsets"))
+cat("tr-1k:")
+inspect(sort(freq_trans_1k, decreasing = T, by = "count"))
+```
+```{r}
+freq_trans_5k <- apriori(trans_5k, parameter=list(support=0.001, target="frequent itemsets"))
+cat("tr-5k:")
+inspect(sort(freq_trans_5k, decreasing = T, by = "count"))
+```
+```{r}
+freq_trans_20k <- apriori(trans_20k, parameter=list(support=0.001, target="frequent itemsets"))
+cat("tr-20k:")
+inspect(sort(freq_trans_20k, decreasing = T, by = "count"))
+```
+```{r}
+freq_trans_75k <- apriori(trans_75k, parameter=list(support=0.001, target="frequent itemsets"))
+cat("tr-75k:")
+inspect(sort(freq_trans_75k, decreasing = T, by = "count"))
+```
+
+```{r}
+cat("Rule:")
+rules_1k <- apriori(trans_1k, parameter = list(support=0.005))
+cat("tr-1k:")
+inspect(rules_1k, by="confidence")
+```
+```{r}
+rules_5k <- apriori(trans_5k, parameter = list(support=0.001))
+cat("tr-5k:")
+inspect(rules_5k, by = "confidence")
+```
+```{r}
+rules_20k <- apriori(trans_20k, parameter = list(support=0.001))
+cat("tr-20k:")
+inspect(rules_20k, by = "confidence")
+```
+```{r}
+rules_75k <- apriori(trans_75k, parameter = list(support=0.0005))
+cat("tr-75k:")
+inspect(rules_75k, by = "confidence")
+```
+
+### C
+**Rule: {Chocolate Tart, Walnut Cookie} => {Vanilla Frappuccino}**
+
+|Subset|Support|Confidence|Lift|Count|
+|:----:|:-----:|:--------:|:--:|:---:|
+|tr-1k|0.018|1|13.513514|18|
+|tr-5k|0.0266|0.9300699|12.671252|133|
+|tr-20k|0.02825|0.9247136|12.048385|565|
+|tr-75k|0.0267600000|0.9369748|12.095200|2007|
+
+**Rule: {Vanilla Frappuccino, Walnut Cookie} => {Chocolate Tart}**
+
+|Subset|Support|Confidence|Lift|Count|
+|:----:|:-----:|:--------:|:--:|:---:|
+|tr-1k|0.018|1|19.607843|18|
+|tr-5k|0.0266|0.8926174|11.714140|133|
+|tr-20k|0.02825|0.9127625|11.954977|565|
+|tr-75k|0.0267600000|0.9396067|12.745615|2007|
+
+**Rule: {Green Tea, Lemon Lemonade} => {Lemon Cookie}**
+
+|Subset|Support|Confidence|Lift|Count|
+|:----:|:-----:|:--------:|:--:|:---:|
+|tr-1k|0.019|0.9047619|13.708514|19|
+|tr-5k|0.0214|0.9304348|14.492754|107|
+|tr-20k|0.02055|0.9194631|13.471987|411|
+|tr-75k|0.0208533333|0.9056167|13.315281|1564|
+
+**Observation**
+
+As the number of the transactions increase, the value of the support is slightly increase. Also, the count of the itemsets is increased. The value of the lift is stable. It means that the number of transactions does not affect the association rule. However, it is hard to find the pattern for the value of the confidence.
+
+### d
+#### i)
+```{r}
+inspect(head(sort(rules_75k, decreasing = T, by="count")))
+```
+
+The most frequently purchased item or itemsets is {Apricot Danish, Opera Cake} => {Cherry Tart}. The count of it is 3083. The itemset, {Cherry Tart, Opera Cake} => {Apricot Danish}, is also 3083 counts, but the confidence of it, 94.77% is lower than {Apricot, Danish, Opera Cake} => {Cherry Tart}, 95.54%.
+
+#### ii)
+```{r}
+inspect(tail(sort(rules_75k, decreasing = T, by="count")))
+```
+
+The least frequently purchased item or itemsets is {Apple Danish, Chocolate Tart, Walnut Cookie} => {Vanilla Frappuccino} with 38 counts. There are other itemsets with 38 counts, but {Apple Danish, Chocolate Tart, Walnut Cookie} => {Vanilla Frappuccino} has the smaller other values.

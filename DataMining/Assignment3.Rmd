@@ -1,0 +1,145 @@
+---
+title: "CS 422 Assignment 3"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+# The setup chunk, set your working directory here and do other global 
+# tasks like loading libraries.  See  
+# https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html for
+# more information.
+knitr::opts_knit$set(root.dir = '/Users/namgyulee/IIT/Fall 2023/CS 422/')
+```
+
+## 2 Practicum problems
+### 2.1 Linear Regression
+
+```{r}
+df <- read.csv("/Users/namgyulee/IIT/Fall 2023/CS 422/CS422_Assignment3_NamGyu_Lee/nba.csv")
+df
+```
+
+#### (a)
+I choose FGA, Field goals attempted.
+```{r}
+library(psych)
+X <- subset(df, select = c(FGA, PTS))
+print(X)
+pairs.panels(X)
+
+# correlation between "Position" and "PTS"
+position <- subset(df, select = c(POSITION, PTS))
+pairs.panels(position)
+
+# Correlation between "Venue" and "PTS"
+venue <- subset(df, select = c(VENUE, PTS))
+pairs.panels(venue)
+```
+
+#### (b)
+```{r}
+model <- lm(PTS ~ FGA, data = X)
+summary(model)
+```
+i) Multiple R-squared: 0.7512. Since R-squared is over 0.75, it capture most of the variance.
+
+```{r}
+# ii)
+plot(model, 1)
+mean <- mean(model$residuals)
+variance <- (summary(model)$sigma)^2
+print(paste("The mean of the residuals is ", mean))
+print(paste("The variance of the residuals is ", variance))
+```
+ii) Yes, the residuals are homoscedatic and clustered around 0.
+
+```{r}
+# iii)
+hist(model$residuals)
+```
+
+iii) Yes the residuals normally distributed.
+
+#### c)
+```{r}
+plot(x=df$FGA, y=df$PTS, xlab = "Field goals attempted", ylab = "Points scored", main = "Points scored per field goals attempted")
+abline(lm(df$PTS ~ df$FGA))
+```
+
+```{r}
+set.seed(1122)
+index <- sample(1:nrow(df), 250)
+train <- df[index, ]
+test <- df[-index, ]
+```
+
+#### d)
+```{r}
+library(psych)
+
+ds <- train[, 8:22]
+ds_name <- names(ds)
+pts <- train$PTS
+correlations <- cor(ds, pts, use = "pairwise.complete.obs")
+correlations
+
+#cor_list <- rbind(ds_name, correlations)
+#cor_list
+#row.names(correlations)
+#ds2 <- correlations %>% slice_head(n=5)
+#ds2
+#for (i in (1:15)) {
+#  col_name <- row.names(correlations[i])
+#  cor_value <- i
+  
+#  cat("Variable:", col_name, "Correlation:", cor_value, "\n")
+#}
+
+sorted_cor <- sort(correlations, decreasing = TRUE)
+sorted_cor
+
+
+top_cor <- sorted_cor[1:5]
+top_cor
+plot(top_cor)
+
+cor_list <- subset(train, select = c(FG, FGA, MIN, FT, FTA, PTS))
+cor_list
+```
+
+#### e)
+```{r}
+model2 <- lm(pts ~ FG + FGA + MIN + FT + FTA, data = train)
+summary(model2)
+```
+Multiple R-squared is 0.9799, it means it covers most variance. As R-squared is high, this model is fit. Since p-value is extremely small, regression model is meaningful and that the independent variables are valuable in explaining the variation in the dependent variable.
+
+#### f)
+```{r}
+plot(model2)
+```
+
+In the residuals vs. fitted plot, it appears homoscedastic and clustered around 0.
+
+#### g)
+```{r}
+hist(model2$residuals)
+```
+
+I think I could say the histogram of the residuals follows the Gaussian distribution.
+
+#### h)
+```{r}
+prediction <- predict(model2, newdata = test)
+result <- data.frame(predicted_pts = prediction, actual_pts = test$PTS)
+matched <- sum(result$Predicted_pts == result$actual_pts)
+
+cat("Number of matched values:", matched, "\n")
+```

@@ -1,0 +1,186 @@
+---
+title: "CS 422 Assignment 6"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+# The setup chunk, set your working directory here and do other global 
+# tasks like loading libraries.  See  
+# https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html for
+# more information.
+knitr::opts_knit$set(root.dir = '/Users/namgyulee/IIT/Fall 2023/CS 422/Assignment/CS422_Assignment6_NamGyu_Lee/')
+```
+
+# 2. Practicum Problems
+## 2.1 Feed Forward Neural Networks
+
+```{r}
+library(keras)
+library(dplyr)
+library(caret)
+library(rpart)
+library(rpart.plot)
+
+rm(list=ls())
+```
+
+```{r}
+df <- read.csv("/Users/namgyulee/IIT/Fall 2023/CS 422/Assignment/wifi_localization.csv", header=T, sep=",", comment.char = '#')
+
+# Seed the PRNG
+set.seed(1122)
+df <- df[sample(nrow(df)), ] # Shuffle, as all of the data in the .csv file
+                             # is ordered by label!  
+
+index <- sample(nrow(df), size=0.2*nrow(df))
+test <- df[index, ]
+train <- df[-index, ]
+```
+
+### (a)
+```{r}
+model <- rpart(room ~ ., data = train, method = "class")
+
+predicted <- predict(model, test, type = "class")
+
+# Create the confusion matrix
+confusion_matrix <- confusionMatrix(predicted, as.factor(test$room))
+
+
+accuracy <- confusion_matrix$overall["Accuracy"]
+sensitivity <- confusion_matrix$byClass[1:4, "Sensitivity"]
+specificity <- confusion_matrix$byClass[1:4, "Specificity"]
+PPV <- confusion_matrix$byClass[1: 4, "Pos Pred Value"]
+balanced_accuracy <- confusion_matrix$byClass[1:4, "Balanced Accuracy"]
+
+cat("Decision Tree Model\n", "Overall accuarcy: ", accuracy, "\n",
+    "Sensitivity ", "Class 1: ", sensitivity[1], " Class 2: ", sensitivity[2], "\n",
+    "            ", "Class 3: ", sensitivity[3], " Class 4: ", sensitivity[4], "\n",
+    "Specificity ", "Class 1: ", specificity[1], " Class 2: ", specificity[2], "\n",
+    "            ", "Class 3: ", specificity[3], " Class 4: ", specificity[4], "\n",
+    "PPV         ", "Class 1: ", PPV[1], " Class 2: ", PPV[2], "\n",
+    "            ", "Class 3: ", PPV[3], " Class 4: ", PPV[4], "\n",
+    "Bal. Acc    ", "Class 1: ", balanced_accuracy[1], " Class 2: ", balanced_accuracy[2], "\n",
+    "            ", "Class 3: ", balanced_accuracy[3], " Class 4: ", balanced_accuracy[4])
+```
+
+
+### (b)
+```{r}
+X_train <- select(train, -room)
+y_train <- train$room
+
+y_train.ohe <- to_categorical(y_train)
+
+X_test <- select(test, -room)
+y_test <- test$room
+y_test.ohe <- to_categorical(test$room)
+
+model_b <- keras_model_sequential() %>% layer_dense(units = 1, activation="relu", input_shape = ncol(X_train)) %>% layer_dense(units = 5, activation="softmax")
+
+model_b %>% compile(loss = "categorical_crossentropy", optimizer = "adam", metrics=c("accuracy"))
+
+model_b %>% fit(data.matrix(X_train), y_train.ohe, epochs=100, batch_size=32, validation_split = 0.20)
+
+model_b %>% evaluate(as.matrix(X_test), y_test.ohe)
+
+pred.prob <- predict(model_b, as.matrix(X_test))
+
+pred.class <- apply(pred.prob, 1, function(x) which.max(x)-1)
+
+con_mat <- confusionMatrix(as.factor(pred.class), as.factor(y_test))
+con_mat
+```
+
+#### i)
+```{r}
+results <- model_b %>% evaluate(as.matrix(X_test), y_test.ohe)
+model_b_loss <- results["loss"]
+model_b_accuracy <- results["accuracy"]
+
+cat("For one neuron in hidden layer, loss: ", model_b_loss, ", Accuracy: ", model_b_accuracy)
+```
+
+#### ii)
+The data is imbalanced.
+
+#### iii)
+```{r}
+cat("Predicted Labels:\n", pred.class, "\n")
+```
+
+It predict certain class.
+
+#### iv)
+The bias of the model is high. Because it predicted certain class and the model has low accuracy.
+
+#### v)
+I do not think so. It might be occur overfitting.
+
+### (c)
+```{r}
+model_2 <- keras_model_sequential() %>% layer_dense(units = 8, activation="relu", input_shape = ncol(X_train)) %>% layer_dense(units = 5, activation="softmax")
+
+model_2 %>% compile(loss = "categorical_crossentropy", optimizer = "adam", metrics=c("accuracy"))
+
+model_2 %>% fit(data.matrix(X_train), y_train.ohe, epochs=100, batch_size=32, validation_split = 0.20)
+
+model_2 %>% evaluate(as.matrix(X_test), y_test.ohe)
+
+pred.prob_2 <- predict(model_2, as.matrix(X_test))
+
+pred.class_2 <- apply(pred.prob_2, 1, function(x) which.max(x)-1)
+
+con_mat2 <- confusionMatrix(as.factor(pred.class_2), as.factor(y_test))
+```
+
+#### i)
+```{r}
+results <- model_2 %>% evaluate(as.matrix(X_test), y_test.ohe)
+model_2_loss <- results["loss"]
+model_2_accuracy <- results["accuracy"]
+
+cat("In this model, loss: ", model_2_loss, ", Accuracy: ", model_2_accuracy)
+```
+
+#### ii)
+```{r}
+cat("Predicted Labels:\n", pred.class, "\n")
+```
+
+I think the bias of the model is just about right. Because the accuracy is high b 0.96, and with the result of the predicted labels, all classes came out evenly.
+
+#### iii)
+At 52. Because both of the accuracy and val_accuracy hit 0.9 at 52 epoch.
+
+### (d)
+```{r}
+accuracy2 <- con_mat2$overall["Accuracy"]
+sensitivity2 <- con_mat2$byClass[1:4, "Sensitivity"]
+specificity2 <- con_mat2$byClass[1:4, "Specificity"]
+PPV2 <- con_mat2$byClass[1: 4, "Pos Pred Value"]
+balanced_accuracy2 <- con_mat2$byClass[1:4, "Balanced Accuracy"]
+
+cat("Best Neural Network Model", "Overall accuarcy: ", accuracy2, "\n",
+    "Sensitivity ", "Class 1: ", sensitivity2[1], " Class 2: ", sensitivity2[2], "\n",
+    "            ", "Class 3: ", sensitivity2[3], " Class 4: ", sensitivity2[4], "\n",
+    "Specificity ", "Class 1: ", specificity2[1], " Class 2: ", specificity2[2], "\n",
+    "            ", "Class 3: ", specificity2[3], " Class 4: ", specificity2[4], "\n",
+    "PPV         ", "Class 1: ", PPV2[1], " Class 2: ", PPV2[2], "\n",
+    "            ", "Class 3: ", PPV2[3], " Class 4: ", PPV2[4], "\n",
+    "Bal. Acc    ", "Class 1: ", balanced_accuracy2[1], " Class 2: ", balanced_accuracy2[2], "\n",
+    "            ", "Class 3: ", balanced_accuracy2[3], " Class 4: ", balanced_accuracy2[4])
+```
+
+#### i)
+Compare with the decision tree, the best neural network model is similar statistics results.
+
+#### ii)
+I would choose the decision tree model, because it is slightly higher accuracy and the code is shorter than the best neural network model.

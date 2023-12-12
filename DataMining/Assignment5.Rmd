@@ -1,0 +1,215 @@
+---
+title: "CS 422 Assignment 5"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+# The setup chunk, set your working directory here and do other global 
+# tasks like loading libraries.  See  
+# https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html for
+# more information.
+knitr::opts_knit$set(root.dir = '/Users/namgyulee/IIT/Fall 2023/CS 422/CS422_Assignment5_NamGyu_Lee')
+```
+
+```{r}
+df <- read.csv("/Users/namgyulee/IIT/Fall 2023/CS 422/Assignment/CS422_Assignment5_NamGyu_Lee/HR-Employee-Attrition.csv", header=T, sep=",", comment.char = '#')
+df
+```
+
+## 2.1
+### a)
+With the observation with "Business Travel" and "Department" and 50 observations, most obervations are "Travel_Rarely" and "Research & Development. Therefore, this dataset is imbalance.
+
+### b)
+```{r}
+set.seed(1121)
+index <- sample(1:nrow(df), size=0.2*nrow(df))
+test <- df[index,]
+train <- df[-index, ]
+```
+
+#### i)
+```{r}
+library(rpart)
+library(caret)
+
+model <- rpart(Attrition ~ ., method="class", data=train)
+print(model)
+
+# create confusion matrix
+pred <- predict(model, test, type="class")
+con_mat <- confusionMatrix(pred, as.factor(test[, 2]), positive="Yes")
+print(con_mat$table)
+```
+
+#### ii)
+```{r}
+# Extract Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy from test dataset confusion matrix
+accuracy <- con_mat$overall["Accuracy"]
+sensitivity <- con_mat$byClass["Sensitivity"]
+specificity <- con_mat$byClass["Specificity"]
+PPV <- con_mat$byClass["Pos Pred Value"]
+balanced_accuracy <- con_mat$byClass["Balanced Accuracy"]
+
+# Print Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy
+cat("Accuracy: ", accuracy, "\n")
+cat("Sensitivity: ", sensitivity, "\n")
+cat("Specificity: ", specificity, "\n")
+cat("PPV: ", PPV, "\n")
+cat("Balanced Accuracy: ", balanced_accuracy, "\n")
+```
+
+#### iii)
+Focusing on the lower sensitivity indicates a preference for minimizing the risk of false negatives, which is particularly important when missing positive cases has more significant consequences than accepting false positives.
+
+#### iv)
+```{r}
+library(rpart.plot)
+library(ROCR)
+
+pred.rocr <- predict(model, newdata=test, type="prob")[,2]
+f.pred <- prediction(pred.rocr, test$Attrition)
+f.perf <- performance(f.pred, "tpr", "fpr")
+plot(f.perf, colorize=T, lwd=3)
+abline(0,1)
+auc <- performance(f.pred, measure = "auc")
+print(paste0("Area under the curve is ", auc@y.values[[1]]))
+```
+
+#### v)
+Since AUC is 0.6863178, it is hard to tell this model is good. AUC is not over 0.8.
+
+## 2.2
+### a)
+```{r}
+set.seed(1121)
+
+# Extract the attrition is "Yes"
+yes <- df[df$Attrition == "Yes", ]
+
+# Extract the attrition is "No"
+no <- df[df$Attrition == "No", ]
+
+# Extract 250 the attrition is "No" randomly
+no_sample <- no[sample(1:nrow(no), 250), ]
+
+# Combinde "Yes" and "No"
+balanced.df <- rbind(yes, no_sample)
+
+# Randomly mix "Yes" and "No"
+balanced.df <- balanced.df[sample(1:nrow(balanced.df)), ]
+
+# Checking the number of observations
+nrow(balanced.df)
+```
+
+### b)
+```{r}
+balanced_index <- sample(1:nrow(balanced.df), size=0.2*nrow(balanced.df))
+balanced_test.df <- balanced.df[index,]
+balanced_train.df <- balanced.df[-index, ]
+```
+
+#### i)
+```{r}
+library(rpart)
+library(caret)
+
+balanced_model <- rpart(Attrition ~ ., method="class", data=balanced_train.df)
+print(balanced_model, "\n")
+
+# create confusion matrix
+balanced_pred <- predict(balanced_model, balanced_test.df, type="class")
+balanced_con_mat <- confusionMatrix(balanced_pred, as.factor(balanced_test.df[, 2]), positive="Yes")
+print(balanced_con_mat$table)
+```
+
+#### ii)
+```{r}
+# Extract Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy from balanced test dataset confusion matrix
+accuracy_balanced <- balanced_con_mat$overall["Accuracy"]
+balanced_sensitivity <- balanced_con_mat$byClass["Sensitivity"]
+balanced_specificity <- balanced_con_mat$byClass["Specificity"]
+balanced_PPV <- balanced_con_mat$byClass["Pos Pred Value"]
+balanced_accuracy2 <- balanced_con_mat$byClass["Balanced Accuracy"]
+
+# Print Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy
+cat("Accuracy: ", accuracy_balanced, "\n")
+cat("Sensitivity: ", balanced_sensitivity, "\n")
+cat("Specificity: ", balanced_specificity, "\n")
+cat("PPV: ", balanced_PPV, "\n")
+cat("Balanced Accuracy: ", balanced_accuracy2, "\n")
+```
+
+#### iii)
+```{r}
+library(ROCR)
+
+# Omit missing value in the test dataset
+balanced_newtest.df <- na.omit(balanced_test.df)
+
+# Plotting ROC curve with new balanced test dataset without missing value, N/A.
+pred.rocr <- predict(balanced_model, newdata=balanced_newtest.df, type="prob")[,2]
+f.pred <- prediction(pred.rocr, balanced_newtest.df$Attrition)
+f.perf <- performance(f.pred, "tpr", "fpr")
+plot(f.perf, colorize=T, lwd=3)
+abline(0,1)
+auc <- performance(f.pred, measure = "auc")
+print(paste0("Area under the curve is ", auc@y.values[[1]]))
+```
+
+#### iv)
+Since the AUC is 0.6602, it is hard to tell the good model. Because AUC is not over 0.8.
+
+## 2.3
+### a)
+```{r}
+library(rpart)
+
+print("Complexity table: ")
+printcp(balanced_model)
+#print("\n")
+best_cp <- which.min(balanced_model$cptable[, "xerror"])
+cat("\nBest CP value:", balanced_model$cptable[best_cp, "CP"], "\n")
+
+# Prune the tree with 0.05195745 CP value
+pruned_model <- prune(balanced_model, cp = balanced_model$cptable[best_cp, "CP"])
+print("Pruned model: ")
+print(pruned_model)
+```
+
+### b)
+```{r}
+library(caret)
+
+pruned_pred <- predict(pruned_model, balanced_test.df, type="class")
+pruned_con_mat <- confusionMatrix(pruned_pred, as.factor(balanced_test.df[, 2]), positive="Yes")
+print(pruned_con_mat$table)
+```
+
+### c)
+```{r}
+# Extract Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy from balanced test dataset confusion matrix with pruned model
+accuracy_pruned <- pruned_con_mat$overall["Accuracy"]
+pruned_sensitivity <- pruned_con_mat$byClass["Sensitivity"]
+pruned_specificity <- pruned_con_mat$byClass["Specificity"]
+pruned_PPV <- pruned_con_mat$byClass["Pos Pred Value"]
+balanced_accuracy3 <- pruned_con_mat$byClass["Balanced Accuracy"]
+
+# Print Accuracy, Sensitivity, Specificity, PPV, Balanced Accuracy
+cat("Accuracy: ", accuracy_pruned, "\n")
+cat("Sensitivity: ", pruned_sensitivity, "\n")
+cat("Specificity: ", pruned_specificity, "\n")
+cat("PPV: ", pruned_PPV, "\n")
+cat("Balanced Accuracy: ", balanced_accuracy3, "\n")
+```
+
+### d)
+Compared with the balanced model, the pruned model has slightly higher "Accuracy", "Sensitivity", "PPV", and "Balanced Accuracy". Therefore, the pruning of the model slightly helped improve the tree.

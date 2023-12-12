@@ -1,0 +1,105 @@
+---
+title: "CS 422 Assignment 2"
+author: "Nam Gyu Lee"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, setup, include=FALSE}
+# The setup chunk, set your working directory here and do other global 
+# tasks like loading libraries.  See  
+# https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html for
+# more information.
+knitr::opts_knit$set(root.dir = '/.../CS 422/DataMining/')
+```
+
+### part (a)
+```{r}
+advertising <- read.csv("/Users/namgyulee/IIT/Fall 2023/CS 422/Advertising.csv")
+
+advertising
+```
+
+### Part (b)
+```{r}
+advertising[1:20, 1:3]
+```
+
+### Part (c)
+```{r}
+advertising[,1:4]
+```
+
+### Part (d)
+```{r}
+plot(x=advertising$sales, y=advertising$radio, xlab = "Sales (x1000)", ylab = "Radio advertising (thousands of $)")
+
+```
+
+### Part (e)
+```{r}
+plot(x=advertising$sales, y=advertising$newspaper, xlab = "Sales (x1000)", ylab = "Newspaper advertising (thousands of $)")
+```
+
+### Part (f)
+```{r}
+plot(x=advertising$sales, y=advertising$TV, xlab = "Sales (x1000)", ylab = "TV advertising (thousands of $)")
+```
+
+### Part (g)
+The plot (e), newspaper advertising and sales, is the most noisiest. The plot (d), and (f) can tell they are not on below certain invisible line.
+
+### Part(h)
+```{r}
+library(psych)
+corPlot(advertising, upper=FALSE, diag=FALSE)
+```
+
+#### Part (h) - a
+TV is the highest positive correlation with sales.
+
+#### Part (h) - b
+There is no negative correlation as we can see the plot. The newspaper is the lowest correlation with sales.
+
+### Part (i)
+```{r}
+boxplot(advertising$TV, advertising$radio, advertising$newspaper, names = c("TV", "radio", "newspaper"), main="Boxplot")
+```
+
+The median of the newspaper is slightly higher than the radio. Also, as we could see the newspaper, there is the outlier above the plot. It means that it is larger than  the claculated max.
+
+### Part (j)
+```{r}
+total <- rowSums(advertising[,1:3])
+print(paste("The total amount of money spent on TV, radio, and newspaper each row is", total))
+library(dplyr)
+df <- advertising %>% mutate(total)
+df %>% slice_max(total, n=10)
+```
+
+### Part (k)
+```{r}
+filter(df, total >= 400)
+```
+
+### Part (l)
+```{r}
+max_sales <- max(df$sales)
+print(paste("Max slaes is", max_sales))
+row <- which(df$sales == max_sales)
+print(paste("Index of max sales is", row))
+col <- df[row,]
+col
+```
+
+### Part (m)
+```{r}
+total_value <- df[176,5]
+print(paste("The value of the total from (l) is", total_value))
+```
+Compare to the value of the total values listed in (k), "367.6" from (l) is lower than listed in (k), "433.6", and "402.4". However, compare with the value of the sales, "27" from (l) is higher than listed in (k). 
