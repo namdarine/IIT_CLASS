@@ -7,7 +7,7 @@ stop_words = stopwords.words('english')
 
 # 1. Obtain the word frequency distribution 
 # BROWN corpora
-brown_words = [word for word in brown.words() if word.lower() not in stop_words]
+brown_words = [word.lower() for word in brown.words() if word.lower() not in stop_words]
 brown_frequencyDistribution = nltk.FreqDist(word.lower() for word in brown_words)
 brown_frequenciesAndWords = dict()
 
@@ -15,7 +15,7 @@ for word in brown_words:
     brown_frequenciesAndWords[word] = brown_frequencyDistribution[word]
 
 # REUTERS corpora
-reuters_words = [word for word in reuters.words() if word.lower() not in stop_words]
+reuters_words = [word.lower() for word in reuters.words() if word.lower() not in stop_words]
 reuters_frequencyDistribution = nltk.FreqDist(word.lower() for word in reuters_words)
 reuters_frequenciesAndWords = dict()
 
@@ -54,8 +54,8 @@ print("\n\n3. Generate log(rank) vs log(frequency) plots for both corpora")
 brown_labels2 = brown_labels[:1000]
 brown_frequencies2 = brown_frequencies[:1000]
 brown_fig, brown_ax = plt.subplots()
-brown_xs = range(len(brown_labels))
-brown_labels2 = range(len(brown_labels))
+brown_xs = range(len(brown_labels2))
+brown_labels2 = range(len(brown_labels2))
 
 
 def format_fn(tick_val, tick_pos):
@@ -69,7 +69,7 @@ def format_fn(tick_val, tick_pos):
 brown_ax.xaxis.set_major_formatter(format_fn)
 brown_ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 #ax.set_yscale('log')
-brown_ax.plot(brown_xs, brown_frequencies)
+brown_ax.plot(brown_xs, brown_frequencies2)
 brown_ax.set_title('Token frequency counts in "brown" corpus ranked')
 brown_ax.set_xscale('log')
 brown_ax.set_yscale('log')
@@ -81,8 +81,8 @@ plt.show()
 reuters_labels2 = reuters_labels[:1000]
 reuters_frequencies2 = reuters_frequencies[:1000]
 reuters_fig, reuters_ax = plt.subplots()
-reuters_xs = range(len(reuters_labels))
-reuters_labels2 = range(len(reuters_labels))
+reuters_xs = range(len(reuters_labels2))
+reuters_labels2 = range(len(reuters_labels2))
 
 
 def format_fn(tick_val, tick_pos):
@@ -96,7 +96,7 @@ def format_fn(tick_val, tick_pos):
 reuters_ax.xaxis.set_major_formatter(format_fn)
 reuters_ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 #ax.set_yscale('log')
-reuters_ax.plot(reuters_xs, reuters_frequencies)
+reuters_ax.plot(reuters_xs, reuters_frequencies2)
 reuters_ax.set_title('Token frequency counts in "reuters" corpus ranked')
 reuters_ax.set_xscale('log')
 reuters_ax.set_yscale('log')
@@ -132,5 +132,5 @@ print(f"{technical_word} - Count: {reuter_tech_word_count}, Probability: {reuter
 print(f"{non_technical_word} - Count: {reuter_nonTech_word_count}, Probability: {reuter_non_tech_prob:.7f}\n")
 
 
-
+print(brown_frequencyDistribution['I am'])
 
