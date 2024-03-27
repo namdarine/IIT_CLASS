@@ -8,6 +8,7 @@
 import re
 import math
 
+
 class naiveBayes:
     def __init__(self):
         self.class_counts = {}
@@ -27,6 +28,7 @@ class naiveBayes:
     
     def predict(self, X):
         all_predicted_labels = []
+        all_probabilities = []
     
         for x in X:
             scores = {}
@@ -43,8 +45,10 @@ class naiveBayes:
             # Find highest probability of each label
             predicted_label = max(probability, key=probability.get)
             all_predicted_labels.append(predicted_label)
+            all_probabilities.append(probability)
     
-        return all_predicted_labels
+        return all_predicted_labels, all_probabilities
+   
     
 def preprocess(text):
     text = text.lower()
@@ -80,31 +84,43 @@ def calculate_metrics(test_labels, pred_labels, label):
 def macro_average(metrics):
     precision_sum = 0
     sensitivity_sum = 0
+    specificity_sum = 0
     f1_score_sum = 0
+
     for class_label, metric in metrics.items():
+        TN = metric['tn']
         TP = metric['tp']
         FP = metric['fp']
         FN = metric['fn']
         precision = 0 if (TP + FP) == 0 else TP / (TP + FP)
         sensitivity = 0 if (TP + FN) == 0 else TP / (TP + FN)
+        specificity = 0 if (TN + FP) == 0 else TN / (TN + FP)
         f1_score = 0 if (precision + sensitivity) == 0 else 2 * precision * sensitivity / (precision + sensitivity)
         precision_sum += precision
         sensitivity_sum += sensitivity
+        specificity_sum += specificity
         f1_score_sum += f1_score
+
+    
     num_classes = len(metrics)
     macro_precision = precision_sum / num_classes
     macro_sensitivity = sensitivity_sum / num_classes
+    macro_specificity = specificity_sum / num_classes
     macro_f1_score = f1_score_sum / num_classes
-    return macro_precision, macro_sensitivity, macro_f1_score
+    return macro_precision, macro_sensitivity, macro_specificity, macro_f1_score
 
 def micro_average(metrics):
+    sum_TN = sum([metric['tn'] for metric in metrics.values()])
     sum_TP = sum([metric['tp'] for metric in metrics.values()])
     sum_FP = sum([metric['fp'] for metric in metrics.values()])
     sum_FN = sum([metric['fn'] for metric in metrics.values()])
+    
     micro_precision = 0 if (sum_TP + sum_FP) == 0 else sum_TP / (sum_TP + sum_FP)
-    micro_recall = 0 if (sum_TP + sum_FN) == 0 else sum_TP / (sum_TP + sum_FN)
-    micro_f1_score = 0 if (micro_precision + micro_recall) == 0 else 2 * micro_precision * micro_recall / (micro_precision + micro_recall)
-    return micro_precision, micro_recall, micro_f1_score
+    micro_sensitivity = 0 if (sum_TP + sum_FN) == 0 else sum_TP / (sum_TP + sum_FN)
+    micro_specificity = 0 if (sum_TN + sum_FP) == 0 else sum_TN / (sum_TN + sum_FP)
+    micro_f1_score = 0 if (micro_precision + micro_sensitivity) == 0 else 2 * micro_precision * micro_sensitivity / (micro_precision + micro_sensitivity)
+
+    return micro_precision, micro_sensitivity, micro_specificity, micro_f1_score
 
 def count_labels(y):
     label_counts = {}
