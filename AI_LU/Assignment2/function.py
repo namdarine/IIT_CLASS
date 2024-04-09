@@ -7,6 +7,8 @@
 
 import re
 import math
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
 class naiveBayes:
@@ -53,7 +55,13 @@ class naiveBayes:
 def preprocess(text):
     text = text.lower()
     text = re.sub(r'[^a-z0-9\s]', '', text)
-    return text
+    stop_words = set(stopwords.words('english'))
+    word_tokens = word_tokenize(text)
+    filtered_text = [word for word in word_tokens if word not in stop_words]
+    
+    
+    processed_text = ' '.join(filtered_text)
+    return processed_text
 
 def evaluate_classifier(TP, TN, FP, FN):
     sensitivity = 0 if (TP + FN) == 0 else TP / (TP + FN)
