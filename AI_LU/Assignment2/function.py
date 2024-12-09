@@ -43,11 +43,15 @@ class naiveBayes:
     
             # Calculate the probability of each label
             probability = {label: math.exp(scores[label]) for label in scores}
+
+            # Convert to probability to percentage
+            total_probability = sum(probability.values())
+            percentage = {label: (prob / total_probability) * 100 for label, prob in probability.items()}
     
             # Find highest probability of each label
-            predicted_label = max(probability, key=probability.get)
+            predicted_label = max(percentage, key=percentage.get)
             all_predicted_labels.append(predicted_label)
-            all_probabilities.append(probability)
+            all_probabilities.append(percentage)
     
         return all_predicted_labels, all_probabilities
    
